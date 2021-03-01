@@ -1,20 +1,20 @@
-import React from 'react';
 import loadable from '@loadable/component';
-import { Switch, Route, Redirect } from 'react-router-dom';
+import React from 'react';
+import { Redirect, Route, Switch } from 'react-router-dom';
 
+const Workspace = loadable(() => import('@layouts/Workspace'));
 const LogIn = loadable(() => import('@pages/LogIn'));
 const SignUp = loadable(() => import('@pages/SignUp'));
-const WorkSpace = loadable(() => import('@layouts/Workspace'));
 
-const App = () => {
-  return (
-    <Switch>
-      <Redirect exact path="/" to="/login" />
-      <Route path="/login" component={LogIn} />
-      <Route path="/signup" component={SignUp} />
-      <Route path="/workspace/:workspace" component={WorkSpace} />
-    </Switch>
-  );
-};
+const App = () => (
+  <Switch>
+    <Route exact path="/">
+      <Redirect to="/login" />
+    </Route>
+    <Route path="/login" component={LogIn} />
+    <Route path="/signup" component={SignUp} />
+    <Route path="/workspace/:workspace" component={Workspace} />
+  </Switch>
+);
 
 export default App;

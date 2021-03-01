@@ -1,25 +1,30 @@
 import useInput from '@hooks/useInput';
 import { Button, Error, Form, Header, Input, Label, LinkContainer } from '@pages/SignUp/styles';
-import axios from 'axios';
-import { Link, Redirect } from 'react-router-dom';
-import React, { useCallback, useState } from 'react';
-import useSwr from 'swr';
 import fetcher from '@utils/fetcher';
+import axios from 'axios';
+import React, { useCallback, useState } from 'react';
+import { Redirect } from 'react-router-dom';
+import useSWR from 'swr';
 
 const LogIn = () => {
-  const { data, error, revalidate, mutate } = useSwr('http://localhost:3095/api/users', fetcher);
+  const { data: userData, error, revalidate } = useSWR('/api/users', fetcher);
   const [logInError, setLogInError] = useState(false);
   const [email, onChangeEmail] = useInput('');
   const [password, onChangePassword] = useInput('');
-
   const onSubmit = useCallback(
     (e) => {
       e.preventDefault();
       setLogInError(false);
       axios
-        .post('http://localhost:3095/api/users/login', { email, password }, { withCredentials: true })
-        .then((response) => {
-          mutate(response.data, false);
+        .post(
+          '/api/users/login',
+          { email, password },
+          {
+            withCredentials: true,
+          },
+        )
+        .then(() => {
+          revalidate();
         })
         .catch((error) => {
           setLogInError(error.response?.data?.statusCode === 401);
@@ -28,19 +33,11 @@ const LogIn = () => {
     [email, password],
   );
 
-  if (data === undefined) {
-    return <div>loading...</div>;
-  }
-
-  if (data) {
+  console.log(error, userData);
+  if (!error && userData) {
+    console.log('로그인됨', userData);
     return <Redirect to="/workspace/sleact/channel/일반" />;
   }
-
-  // console.log(error, userData);
-  // if (!error && userData) {
-  //   console.log('로그인됨', userData);
-  //   return <Redirect to="/workspace/sleact/channel/일반" />;
-  // }
 
   return (
     <div id="container">
@@ -63,7 +60,7 @@ const LogIn = () => {
       </Form>
       <LinkContainer>
         아직 회원이 아니신가요?&nbsp;
-        <Link to="/signup">회원가입 하러가기</Link>
+        <a href="/signup">회원가입 하러가기</a>
       </LinkContainer>
     </div>
   );
